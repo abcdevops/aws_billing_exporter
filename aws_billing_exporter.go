@@ -180,7 +180,8 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 }
 
 func fetchHTTP(metrics []string, timeout time.Duration) func() (*costexplorer.GetCostAndUsageOutput, error) {
-	client := costexplorer.New(session.New())
+	sess := session.Must(session.NewSession())
+	client := costexplorer.New(sess)
 
 	return func() (*costexplorer.GetCostAndUsageOutput, error) {
 		input := &costexplorer.GetCostAndUsageInput{
