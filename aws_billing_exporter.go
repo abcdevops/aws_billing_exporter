@@ -150,7 +150,6 @@ func (e *Exporter) scrape(ch chan<- prometheus.Metric) (up float64) {
 			}
 		}
 	}
-	log.Infoln("RESULT: ", response)
 
 	return 1
 }
