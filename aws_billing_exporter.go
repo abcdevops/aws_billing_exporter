@@ -53,13 +53,13 @@ AWSMetrics are original metrics defined by AWS
 **/
 var (
 	prometheusMetrics = metrics{
-		1: newAwsBillingMetric("amortized_cost", "Current number of queued requests assigned to this server.", nil),
-		2: newAwsBillingMetric("blended_cost", "Maximum observed number of queued requests assigned to this server.", nil),
-		3: newAwsBillingMetric("net_amortized_cost", "Current number of active sessions.", nil),
-		4: newAwsBillingMetric("net_unblended_cost", "Maximum observed number of active sessions.", nil),
-		5: newAwsBillingMetric("normalized_usage_amount", "Configured session limit.", nil),
-		6: newAwsBillingMetric("unblended_cost", "Total number of sessions.", nil),
-		7: newAwsBillingMetric("usage_quantity", "Current total of incoming bytes.", nil),
+		1: newAwsBillingMetric("amortized_cost", "Amortized cost.", nil),
+		2: newAwsBillingMetric("blended_cost", "Blended cost.", nil),
+		3: newAwsBillingMetric("net_amortized_cost", "Net amortixed cost.", nil),
+		4: newAwsBillingMetric("net_unblended_cost", "Net unblended cost.", nil),
+		5: newAwsBillingMetric("normalized_usage_amount", "Normalized usage amount.", nil),
+		6: newAwsBillingMetric("unblended_cost", "Unblended cost.", nil),
+		7: newAwsBillingMetric("usage_quantity", "Uage quantity.", nil),
 	}
 	awsBillingUp = prometheus.NewDesc(prometheus.BuildFQName(namespace, "", "up"), "Was the last scrape of aws billing successful.", nil, nil)
 	AWSMetrics   = awsMetrics{
