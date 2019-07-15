@@ -25,7 +25,7 @@ const (
 )
 
 var (
-	serverLabelNames = []string{"backend", "server"}
+	serverLabelNames = []string{"start", "end", "cost"}
 )
 
 func newAwsBillingMetric(metricName string, docString string, constLabels prometheus.Labels) *prometheus.Desc {
@@ -142,11 +142,10 @@ func (e *Exporter) scrape(ch chan<- prometheus.Metric) (up float64) {
 	}
 
 	for key, metric := range e.prometheusMetrics {
-
 		for awsCostKey, cost := range response.ResultsByTime[0].Total {
 			if awsCostKey == AWSMetrics[key] {
 				if f, err := strconv.ParseFloat(*cost.Amount, 64); err == nil {
-					ch <- prometheus.MustNewConstMetric(metric, prometheus.GaugeValue, f, "testLabel", "testLabel2")
+					ch <- prometheus.MustNewConstMetric(metric, prometheus.GaugeValue, f, *response.ResultsByTime[0].TimePeriod.Start, *response.ResultsByTime[0].TimePeriod.End, "aws")
 				}
 			}
 		}
