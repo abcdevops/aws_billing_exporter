@@ -6,8 +6,6 @@ orbs:
 
 jobs:
   test:
-    # Whenever the Go version is updated here, .travis.yml and .promu.yml
-    # should also be updated.
     docker:
     - image: circleci/golang:1.12
 
