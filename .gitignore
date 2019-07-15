@@ -1,0 +1,8 @@
+.build
+bin/aws_billing_exporter*
+aws_billing_exporter
+*.tar.gz
+*.test
+*.mprof
+*-stamp
+tmp
