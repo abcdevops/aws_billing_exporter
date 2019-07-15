@@ -77,7 +77,7 @@ var (
 // the prometheus metrics package.
 type Exporter struct {
 	mutex sync.RWMutex
-	fetch func() (interface{}, error)
+	fetch func() (*costexplorer.GetCostAndUsageOutput, error)
 
 	up                prometheus.Gauge
 	totalScrapes      prometheus.Counter
@@ -87,7 +87,7 @@ type Exporter struct {
 // NewExporter returns an initialized Exporter.
 func NewExporter(filter string, selectedServerMetrics map[int]*prometheus.Desc, timeout time.Duration) (*Exporter, error) {
 
-	var fetch func() (interface{}, error)
+	var fetch func() (*costexplorer.GetCostAndUsageOutput, error)
 	selected := []string{}
 	if len(filter) == 0 {
 		for _, v := range AWSMetrics {
@@ -135,20 +135,23 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 func (e *Exporter) scrape(ch chan<- prometheus.Metric) (up float64) {
 	e.totalScrapes.Inc()
 
-	body, err := e.fetch()
+	response, err := e.fetch()
 	if err != nil {
 		log.Errorf("Can't scrape AWS Billing data: %v", err)
 		return 0
 	}
 
-	// json.NewDecoder(body).Decode(jsonResponse)
-	// fmt.Println(response)
+	for key, metric := range e.prometheusMetrics {
 
-	for _, metric := range e.prometheusMetrics {
-
-		ch <- prometheus.MustNewConstMetric(metric, prometheus.GaugeValue, 1884.3, "testLabel")
+		for awsCostKey, cost := range response.ResultsByTime[0].Total {
+			if awsCostKey == AWSMetrics[key] {
+				if f, err := strconv.ParseFloat(*cost.Amount, 64); err == nil {
+					ch <- prometheus.MustNewConstMetric(metric, prometheus.GaugeValue, f, "testLabel", "testLabel2")
+				}
+			}
+		}
 	}
-	log.Infoln("RESULT: ", body)
+	log.Infoln("RESULT: ", response)
 
 	return 1
 }
@@ -165,10 +168,10 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 	ch <- e.totalScrapes
 }
 
-func fetchHTTP(metrics []string, timeout time.Duration) func() (interface{}, error) {
+func fetchHTTP(metrics []string, timeout time.Duration) func() (*costexplorer.GetCostAndUsageOutput, error) {
 	client := costexplorer.New(session.New())
 
-	return func() (interface{}, error) {
+	return func() (*costexplorer.GetCostAndUsageOutput, error) {
 		input := &costexplorer.GetCostAndUsageInput{
 			Metrics:     aws.StringSlice(metrics),
 			Granularity: aws.String("DAILY"),
