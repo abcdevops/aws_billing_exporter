@@ -8,4 +8,4 @@ ARG OS="linux"
 COPY .build/${OS}-${ARCH}/aws_billing_exporter /bin/aws_billing_exporter
 
 ENTRYPOINT ["/bin/aws_billing_exporter"]
-EXPOSE     9121
+EXPOSE     9614
