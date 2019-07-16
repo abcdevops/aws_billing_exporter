@@ -63,8 +63,6 @@ jobs:
         command: docker login -u $QUAY_LOGIN -p $QUAY_PASSWORD quay.io
     - run:
         command: make docker-publish DOCKER_REPO=quay.io/abcdevops
-    - run:
-        command: make docker-manifest DOCKER_REPO=quay.io/abcdevops
   prometheus/publish_release:
     docker:
     - image: circleci/golang
