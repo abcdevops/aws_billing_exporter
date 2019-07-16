@@ -1,7 +1,5 @@
 go:
-    # Whenever the Go version is updated here, .travis.yml and
-    # .circle/config.yml should also be updated.
-    version: 1.12
+    cgo: true
 repository:
     path: github.com/abcdevops/aws_billing_exporter
 build:
@@ -20,16 +18,7 @@ tarball:
         - NOTICE
 crossbuild:
     platforms:
-        - linux/amd64
-        - linux/386
         - darwin/amd64
         - darwin/386
-        - linux/arm
-        - linux/arm64
-        - linux/mips
-        - linux/mipsle
-        - linux/mips64
-        - linux/mips64le
-        - linux/ppc64
-        - linux/ppc64le
-        - linux/s390x
+        - netbsd/amd64
+        - netbsd/386
