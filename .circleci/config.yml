@@ -46,15 +46,15 @@ jobs:
     - attach_workspace:
         at: .
     - run:
-        command: make docker DOCKER_REPO=docker.io/prom
+        command: make docker DOCKER_REPO=docker.io/abcdevops
     - run:
         command: docker images
     - run:
         command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD docker.io
     - run:
-        command: make docker-publish DOCKER_REPO=abcdevops
+        command: make docker-publish DOCKER_REPO=docker.io/abcdevops
     - run:
-        command: make docker-manifest DOCKER_REPO=abcdevops
+        command: make docker-manifest DOCKER_REPO=docker.io/abcdevops
     - run:
         command: make docker DOCKER_REPO=quay.io/abcdevops
     - run:
@@ -88,38 +88,38 @@ jobs:
         destination: releases
         path: .tarballs
     - run:
-        command: make docker DOCKER_IMAGE_TAG="$CIRCLE_TAG" DOCKER_REPO=docker.io/prom
+        command: make docker DOCKER_IMAGE_TAG="$CIRCLE_TAG" DOCKER_REPO=docker.io/abcdevops
     - run:
         command: docker images
     - run:
         command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD docker.io
     - run:
-        command: make docker-publish DOCKER_IMAGE_TAG="$CIRCLE_TAG" DOCKER_REPO=docker.io/prom
+        command: make docker-publish DOCKER_IMAGE_TAG="$CIRCLE_TAG" DOCKER_REPO=docker.io/abcdevops
     - run:
-        command: make docker-manifest DOCKER_IMAGE_TAG="$CIRCLE_TAG" DOCKER_REPO=docker.io/prom
+        command: make docker-manifest DOCKER_IMAGE_TAG="$CIRCLE_TAG" DOCKER_REPO=docker.io/abcdevops
     - run:
         command: |
           if [[ "$CIRCLE_TAG" =~ ^v[0-9]+(\.[0-9]+){2}$ ]]; then
-            make docker-tag-latest DOCKER_IMAGE_TAG="$CIRCLE_TAG" DOCKER_REPO=docker.io/prom
-            make docker-publish DOCKER_IMAGE_TAG="latest" DOCKER_REPO=docker.io/prom
-            make docker-manifest DOCKER_IMAGE_TAG="latest" DOCKER_REPO=docker.io/prom
+            make docker-tag-latest DOCKER_IMAGE_TAG="$CIRCLE_TAG" DOCKER_REPO=docker.io/abcdevops
+            make docker-publish DOCKER_IMAGE_TAG="latest" DOCKER_REPO=docker.io/abcdevops
+            make docker-manifest DOCKER_IMAGE_TAG="latest" DOCKER_REPO=docker.io/abcdevops
           fi
     - run:
-        command: make docker DOCKER_IMAGE_TAG="$CIRCLE_TAG" DOCKER_REPO=quay.io/prometheus
+        command: make docker DOCKER_IMAGE_TAG="$CIRCLE_TAG" DOCKER_REPO=quay.io/abcdevops
     - run:
         command: docker images
     - run:
         command: docker login -u $QUAY_LOGIN -p $QUAY_PASSWORD quay.io
     - run:
-        command: make docker-publish DOCKER_IMAGE_TAG="$CIRCLE_TAG" DOCKER_REPO=quay.io/prometheus
+        command: make docker-publish DOCKER_IMAGE_TAG="$CIRCLE_TAG" DOCKER_REPO=quay.io/abcdevops
     - run:
-        command: make docker-manifest DOCKER_IMAGE_TAG="$CIRCLE_TAG" DOCKER_REPO=quay.io/prometheus
+        command: make docker-manifest DOCKER_IMAGE_TAG="$CIRCLE_TAG" DOCKER_REPO=quay.io/abcdevops
     - run:
         command: |
           if [[ "$CIRCLE_TAG" =~ ^v[0-9]+(\.[0-9]+){2}$ ]]; then
-            make docker-tag-latest DOCKER_IMAGE_TAG="$CIRCLE_TAG" DOCKER_REPO=quay.io/prometheus
-            make docker-publish DOCKER_IMAGE_TAG="latest" DOCKER_REPO=quay.io/prometheus
-            make docker-manifest DOCKER_IMAGE_TAG="latest" DOCKER_REPO=quay.io/prometheus
+            make docker-tag-latest DOCKER_IMAGE_TAG="$CIRCLE_TAG" DOCKER_REPO=quay.io/abcdevops
+            make docker-publish DOCKER_IMAGE_TAG="latest" DOCKER_REPO=quay.io/abcdevops
+            make docker-manifest DOCKER_IMAGE_TAG="latest" DOCKER_REPO=quay.io/abcdevops
           fi
 workflows:
   version: 2
