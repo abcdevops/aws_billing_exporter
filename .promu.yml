@@ -6,7 +6,7 @@ repository:
     path: github.com/abcdevops/aws_billing_exporter
 build:
     binaries:
-        - name: node_exporter
+        - name: aws_billing_exporter
     flags: -mod=vendor -a -tags 'netgo static_build'
     ldflags: |
         -X github.com/prometheus/common/version.Version={{.Version}}
@@ -22,8 +22,6 @@ crossbuild:
     platforms:
         - linux/amd64
         - linux/386
-        - darwin/amd64
-        - darwin/386
         - linux/arm
         - linux/arm64
         - linux/mips
