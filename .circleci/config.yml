@@ -31,6 +31,7 @@ workflows:
             only: /.*/
     - prometheus/publish_master:
         context: abcdevops
+        organization: abcdevops
         requires:
         - test
         - build
