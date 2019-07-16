@@ -13,7 +13,7 @@ jobs:
     - prometheus/setup_environment
     - setup_remote_docker
     - run: make
-    - prometheus/store_artifact:
+    - abcdevops/store_artifact:
         file: aws_billing_exporter
 
 workflows:
@@ -24,12 +24,12 @@ workflows:
         filters:
           tags:
             only: /.*/
-    - prometheus/build:
+    - abcdevops/build:
         name: build
         filters:
           tags:
             only: /.*/
-    - prometheus/publish_master:
+    - abcdevops/publish_master:
         context: abcdevops
         requires:
         - test
@@ -37,7 +37,7 @@ workflows:
         filters:
           branches:
             only: master
-    - prometheus/publish_release:
+    - abcdevops/publish_release:
         context: abcdevops
         requires:
         - test
