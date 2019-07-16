@@ -22,3 +22,5 @@ crossbuild:
     platforms:
         - linux/amd64
         - linux/386
+        - linux/arm
+        - linux/arm64
