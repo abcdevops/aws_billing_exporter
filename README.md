@@ -35,12 +35,16 @@ aws_billing_exporter [flags]
 * __`version`:__ Show application version.
 
 
-### Environment variable
+### Usage
 
-It will start pulling BlendedCost aws cost metric from your AWS account
+Your aws credentials should either be in $HOME/.aws/credentials , or set via AWS_ACCESS_KEY and AWS_SECRET_ACCESS_KEY. It will also respect ec2 instances having corresponding role with the required permission to access cost and explorer API.
+
+It will only fetch metrics from AWS when somebody will access <domain>:9614/metrics. So no periodic calls. 
+
+Following will start pulling BlendedCost aws cost metric from your AWS account
 
 ```bash
-export AWS_ACCESS_KEY_ID=<your aws key>
+export AWS_ACCESS_KEY=<your aws key>
 export AWS_SECRET_ACCESS_KEY=<your aws secret key>
 export AWS_REGION=<aws region>
 aws_billing_exporter --aws-billing.metrics="2"
