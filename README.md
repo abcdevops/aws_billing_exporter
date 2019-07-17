@@ -4,7 +4,7 @@
 AWS Billing exporter using cost and explorer API for prometheus
 --
 
-To run it:
+To run it, create AWS secret key, access key and region environment varialbes.
 
 ```bash
 aws_billing_exporter [flags]
@@ -35,3 +35,31 @@ aws_billing_exporter [flags]
 * __`version`:__ Show application version.
 
 
+### Environment variable
+
+It will start pulling BlendedCost aws cost metric from your AWS account
+
+```bash
+export AWS_ACCESS_KEY_ID=<your aws key>
+export AWS_SECRET_ACCESS_KEY=<your aws secret key>
+export AWS_REGION=<aws region>
+aws_billing_exporter --aws-billing.metrics="2"
+```
+
+### Permission policy
+
+You have to add inline policy for your AWS account. Following is the the json object for required permission to access cost and explorer API.
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": "ce:*",
+            "Resource": "*"
+        }
+    ]
+}
+```
