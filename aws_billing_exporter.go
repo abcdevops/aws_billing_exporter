@@ -38,7 +38,7 @@ const (
 )
 
 var (
-	serverLabelNames = []string{"start", "end", "cost"}
+	serverLabelNames = []string{"type", "unit"}
 )
 
 func newAwsBillingMetric(metricName string, docString string, constLabels prometheus.Labels) *prometheus.Desc {
@@ -66,13 +66,13 @@ AWSMetrics are original metrics defined by AWS
 **/
 var (
 	prometheusMetrics = metrics{
-		1: newAwsBillingMetric("amortized_cost", "Amortized cost.", nil),
-		2: newAwsBillingMetric("blended_cost", "Blended cost.", nil),
-		3: newAwsBillingMetric("net_amortized_cost", "Net amortixed cost.", nil),
-		4: newAwsBillingMetric("net_unblended_cost", "Net unblended cost.", nil),
-		5: newAwsBillingMetric("normalized_usage_amount", "Normalized usage amount.", nil),
-		6: newAwsBillingMetric("unblended_cost", "Unblended cost.", nil),
-		7: newAwsBillingMetric("usage_quantity", "Uage quantity.", nil),
+		1: newAwsBillingMetric("amortized_cost", "This cost metric reflects the effective cost of the upfront and monthly reservation fees spread across the billing period..", nil),
+		2: newAwsBillingMetric("blended_cost", "This cost metric reflects the average cost of usage across the consolidated billing family.", nil),
+		3: newAwsBillingMetric("net_amortized_cost", "This cost metric amortizes the upfront and monthly reservation fees while including discounts such as RI volume discounts.", nil),
+		4: newAwsBillingMetric("net_unblended_cost", "This cost metric reflects the cost after discounts.", nil),
+		5: newAwsBillingMetric("normalized_usage_amount", "Cost of amount of resource consumption like CPU.", nil),
+		6: newAwsBillingMetric("unblended_cost", "Unblended costs separate discounts into their own line items. This enables you to view the amount of each discount received.", nil),
+		7: newAwsBillingMetric("usage_quantity", "Usage of quantity like data in GB.", nil),
 	}
 	awsBillingUp = prometheus.NewDesc(prometheus.BuildFQName(namespace, "", "up"), "Was the last scrape of aws billing successful.", nil, nil)
 	AWSMetrics   = awsMetrics{
@@ -98,7 +98,7 @@ type Exporter struct {
 }
 
 // NewExporter returns an initialized Exporter.
-func NewExporter(filter string, selectedServerMetrics map[int]*prometheus.Desc, timeout time.Duration) (*Exporter, error) {
+func NewExporter(filter string, selectedServerMetrics map[int]*prometheus.Desc) (*Exporter, error) {
 
 	var fetch func() (*costexplorer.GetCostAndUsageOutput, error)
 	selected := []string{}
@@ -116,7 +116,7 @@ func NewExporter(filter string, selectedServerMetrics map[int]*prometheus.Desc, 
 		}
 	}
 
-	fetch = fetchHTTP(selected, timeout)
+	fetch = fetchHTTP(selected)
 
 	return &Exporter{
 		fetch: fetch,
@@ -158,7 +158,7 @@ func (e *Exporter) scrape(ch chan<- prometheus.Metric) (up float64) {
 		for awsCostKey, cost := range response.ResultsByTime[0].Total {
 			if awsCostKey == AWSMetrics[key] {
 				if f, err := strconv.ParseFloat(*cost.Amount, 64); err == nil {
-					ch <- prometheus.MustNewConstMetric(metric, prometheus.GaugeValue, f, *response.ResultsByTime[0].TimePeriod.Start, *response.ResultsByTime[0].TimePeriod.End, "aws")
+					ch <- prometheus.MustNewConstMetric(metric, prometheus.GaugeValue, f, awsCostKey, *cost.Unit)
 				}
 			}
 		}
@@ -179,7 +179,7 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 	ch <- e.totalScrapes
 }
 
-func fetchHTTP(metrics []string, timeout time.Duration) func() (*costexplorer.GetCostAndUsageOutput, error) {
+func fetchHTTP(metrics []string) func() (*costexplorer.GetCostAndUsageOutput, error) {
 	sess := session.Must(session.NewSession())
 	client := costexplorer.New(sess)
 
@@ -231,8 +231,7 @@ func main() {
 	var (
 		listenAddress                = kingpin.Flag("web.listen-address", "Address to listen on for web interface and telemetry.").Default(":9614").String()
 		metricsPath                  = kingpin.Flag("web.telemetry-path", "Path under which to expose metrics.").Default("/metrics").String()
-		awsBillingServerMetricFields = kingpin.Flag("aws-billing.metrics", "Comma-separated list of billing metrics. See https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_GetCostAndUsage.html#API_GetCostAndUsage_RequestSyntax").Default(prometheusMetrics.String()).String()
-		awsBillingTimeout            = kingpin.Flag("aws-billing.timeout", "Timeout for trying to get stats from HAProxy.").Default("5s").Duration()
+		awsBillingServerMetricFields = kingpin.Flag("aws-billing.metrics", "Comma-separated list of billing metrics. Leave this argument if you want to scrape all available metrics. See https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_GetCostAndUsage.html#API_GetCostAndUsage_RequestSyntax").Default(prometheusMetrics.String()).String()
 	)
 
 	log.AddFlags(kingpin.CommandLine)
@@ -248,7 +247,7 @@ func main() {
 	log.Infoln("Starting aws_billing_exporter", version.Info())
 	log.Infoln("Build context", version.BuildContext())
 
-	exporter, err := NewExporter(*awsBillingServerMetricFields, selectedServerMetrics, *awsBillingTimeout)
+	exporter, err := NewExporter(*awsBillingServerMetricFields, selectedServerMetrics)
 	if err != nil {
 		log.Fatal(err)
 	}
