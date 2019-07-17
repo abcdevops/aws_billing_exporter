@@ -1,5 +1,6 @@
 [![CircleCI](https://circleci.com/gh/abcdevops/aws_billing_exporter.svg?style=svg)](https://circleci.com/gh/abcdevops/aws_billing_exporter)
 [![Docker Pulls](https://img.shields.io/docker/pulls/abcdevops/aws-billing-exporter.svg?maxAge=604800)](https://hub.docker.com/r/abcdevops/aws-billing-exporter)
+[![Build Status](https://travis-ci.org/abcdevops/aws_billing_exporter.svg?branch=master)](https://travis-ci.org/abcdevops/aws_billing_exporter)
 
 AWS Billing exporter using cost and explorer API for prometheus
 --
